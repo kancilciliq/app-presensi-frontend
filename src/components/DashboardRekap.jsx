@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 
@@ -65,8 +65,8 @@ const DashboardRekap = () => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2 className="no-print">Dashboard Rekapitulasi Presensi</h2>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', color: '#111111', backgroundColor: '#ffff' }}>
+      <h2 className="no-print" style={{ color: '#111111' }}>Dashboard Rekapitulasi Presensi</h2>
 
       {/* Filter Section */}
       <div className="no-print" style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px' }}>
@@ -105,7 +105,7 @@ const DashboardRekap = () => {
 
       {/* Summary Cards */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ flex: 1, backgroundColor: '#e9ecef', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
+        <div style={{ flex: 1, backgroundColor: '#0482ff', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
           <h4>Total Kehadiran</h4>
           <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>{totalHadir}</p>
         </div>

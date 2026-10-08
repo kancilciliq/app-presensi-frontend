@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import DataSiswa from './components/DataSiswa';
 import ScanPresensi from './components/ScanPresensi';
@@ -8,19 +7,19 @@ import CetakKartu from './components/CetakKartu';
 function App() {
   return (
     <Router>
-      <div style={{ fontFamily: 'sans-serif' }}>
+      <div style={{ fontFamily: 'sans-serif', backgroundColor: '#ffff', color: '#111111' }}>
         {/* Navigation Bar */}
-        <nav className="no-print" style={{ backgroundColor: '#333', padding: '15px', marginBottom: '20px' }}>
-          <Link to="/" style={{ color: '#fff', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
+        <nav className="no-print" style={{ backgroundColor: '#f6f3f3', padding: '15px', marginBottom: '20px' }}>
+          <Link to="/" style={{ color: '#111111', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
             Data Siswa
           </Link>
-          <Link to="/scan" style={{ color: '#fff', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
+          <Link to="/scan" style={{ color: '#111111', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
             Scan Presensi
           </Link>
-          <Link to="/rekap" style={{ color: '#fff', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
+          <Link to="/rekap" style={{ color: '#111111', marginRight: '20px', textDecoration: 'none', fontWeight: 'bold' }}>
             Rekap & Laporan
           </Link>
-          <Link to="/cetak-kartu" style={{ color: '#fff', textDecoration: 'none', fontWeight: 'bold' }}>
+          <Link to="/cetak-kartu" style={{ color: '#111111', textDecoration: 'none', fontWeight: 'bold' }}>
             Cetak Kartu QR
           </Link>
         </nav>

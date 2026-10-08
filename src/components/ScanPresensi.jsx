@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Html5QrcodeScanner } from 'html5-qrcode';
@@ -38,7 +38,7 @@ const ScanPresensi = () => {
           const msg = err.response?.data?.message || 'Gagal memproses absensi';
           setFeedback({ type: 'error', message: `GAGAL: ${msg}` });
         } finally {
-          setTimeout(() => setFeedback(null), 4000);
+          setTimeout(() => setFeedback(null), 400);
         }
       },
       (error) => {
@@ -53,8 +53,9 @@ const ScanPresensi = () => {
   }, []);
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h2>Scan Presensi via Kamera</h2>
+    <div style={{ padding: '20px', fontFamily: 'sans-serif', color: '#111111', backgroundColor: '#ffff' }}>
+      
+      <h2 style={{ color: '#111111' }}>Scan Presensi via Kamera</h2>
 
       
       <div id="reader" style={{ width: '400px', marginBottom: '20px' }}></div>
