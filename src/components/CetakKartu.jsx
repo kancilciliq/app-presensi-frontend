@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { QRCodeCanvas } from 'qrcode.react';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const CetakKartu = () => {
   const [siswa, setSiswa] = useState([]);
@@ -10,7 +11,7 @@ const CetakKartu = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:3001/api/siswa');
+        const res = await axios.get(`${API_URL}/siswa`);
         setSiswa(res.data);
         const uniqueKelas = [...new Set(res.data.map((s) => s.kelas))];
         setKelasList(uniqueKelas);

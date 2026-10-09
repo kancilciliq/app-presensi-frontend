@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DashboardRekap = () => {
   const [rekapList, setRekapList] = useState([]);
@@ -13,7 +14,7 @@ const DashboardRekap = () => {
 
   // Fetch daftar kelas unik dari backend
   useEffect(() => {
-    axios.get('http://localhost:3001/api/siswa')
+    axios.get(`${API_URL}/siswa`)
       .then((res) => {
         const uniqueKelas = [...new Set(res.data.map((item) => item.kelas))];
         setKelasList(uniqueKelas);
@@ -24,7 +25,7 @@ const DashboardRekap = () => {
   // Fetch data rekap sesuai filter
   const fetchRekap = async () => {
     try {
-      const res = await axios.get('http://localhost:3001/api/presensi/rekap', {
+      const res = await axios.get(`${API_URL}/presensi/rekap`, {
         params: filter
       });
       setRekapList(res.data);

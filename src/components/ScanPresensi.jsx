@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ScanPresensi = () => {
   const [presensiList, setPresensiList] = useState([]);
@@ -9,11 +10,11 @@ const ScanPresensi = () => {
 
   useEffect(() => {
     // 1. Fetch riwayat hari ini
-    axios.get('http://localhost:3001/api/presensi/hari-ini')
+    axios.get(`${API_URL}/presensi/hari-ini`)
       .then(res => setPresensiList(res.data));
 
     // 2. Socket listener
-    const socket = io('http://localhost:3001');
+    const socket = io(`${API_URL.replace('/api', '')}`);
     socket.on('absen_baru', (dataBaru) => {
       setPresensiList((prev) => [dataBaru, ...prev]);
     });
@@ -28,7 +29,7 @@ const ScanPresensi = () => {
       async (nisScanned) => {
         // Dipicu saat kamera berhasil mendeteksi QR Code
         try {
-          const res = await axios.post('http://localhost:3001/api/presensi/scan', { nis: nisScanned });
+          const res = await axios.post(`${API_URL}/presensi/scan`, { nis: nisScanned });
           const { data } = res.data;
           setFeedback({
             type: 'success',

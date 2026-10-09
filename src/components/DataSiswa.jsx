@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
 import { QRCodeCanvas } from 'qrcode.react';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const DataSiswa = () => {
   const [siswa, setSiswa] = useState([]);
@@ -22,7 +23,7 @@ const DataSiswa = () => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/siswa');
+      const response = await axios.get(`${API_URL}/siswa`);
       setSiswa(response.data);
     } catch (error) {
       console.error('Gagal mengambil data:', error);
@@ -32,7 +33,7 @@ const DataSiswa = () => {
   useEffect(() => {
     let isMounted = true;
 
-    axios.get('http://localhost:3001/api/siswa')
+    axios.get(`${API_URL}/siswa`)
       .then((response) => {
         if (isMounted) setSiswa(response.data);
       })
@@ -53,7 +54,7 @@ const DataSiswa = () => {
   const handleAddSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3001/api/siswa', addData);
+      await axios.post(`${API_URL}/siswa`, addData);
       alert('Data siswa berhasil ditambahkan!');
       setAddData({ nis: '', nama: '', kelas: '', no_wa_ortu: '' });
       setShowAddModal(false);
@@ -103,7 +104,7 @@ const DataSiswa = () => {
         ]);
 
         if (formattedData.length > 0) {
-          await axios.post('http://localhost:3001/api/siswa/import', { dataSiswa: formattedData });
+          await axios.post(`${API_URL}/siswa/import`, { dataSiswa: formattedData });
           alert('Data berhasil di-import!');
           fetchData();
         } else {
@@ -122,7 +123,7 @@ const DataSiswa = () => {
   const handleDelete = async (nis) => {
     if (window.confirm(`Yakin ingin menghapus data NIS: ${nis}?`)) {
       try {
-        await axios.delete(`http://localhost:3001/api/siswa/${nis}`);
+        await axios.delete(`${API_URL}/siswa/${nis}`);
         fetchData();
       } catch (error) {
         alert('Gagal menghapus data');
@@ -137,7 +138,7 @@ const DataSiswa = () => {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3001/api/siswa/${editData.nis}`, {
+      await axios.put(`${API_URL}/siswa/${editData.nis}`, {
         nama: editData.nama,
         kelas: editData.kelas,
         no_wa_ortu: editData.no_wa_ortu
