@@ -52,6 +52,7 @@
 /* Jenis notifikasi */
 .scan-notif--success   { --notif-color: var(--color-success); }
 .scan-notif--late      { --notif-color: #fd7e14; }
+.scan-notif--pulang    { --notif-color: #0d6efd; } /* [BARU] scan pulang berhasil */
 .scan-notif--duplicate { --notif-color: var(--color-warning); }
 .scan-notif--error     { --notif-color: var(--color-danger); }
 

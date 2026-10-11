@@ -1,0 +1,38 @@
+/* =====================================================================
+   [BARU] PengaturanJam.css  -  style halaman Pengaturan Jam
+   ===================================================================== */
+.setting-intro {
+  margin-bottom: 16px;
+}
+
+.setting-form {
+  max-width: 460px;
+}
+
+.setting-help {
+  display: block;
+  margin-top: 4px;
+  color: #666;
+  font-size: 12px;
+}
+
+.setting-summary {
+  background-color: var(--color-muted);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.setting-summary ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+.setting-alert {
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.setting-alert--success { background-color: #d4edda; color: #155724; }
+.setting-alert--error   { background-color: #fdecee; color: #842029; }

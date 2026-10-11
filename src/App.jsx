@@ -4,6 +4,7 @@ import DataSiswa from './components/DataSiswa';
 import ScanPresensi from './components/ScanPresensi';
 import DashboardRekap from './components/DashboardRekap';
 import CetakKartu from './components/CetakKartu';
+import PengaturanJam from './components/PengaturanJam'; // [BARU]
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
           <Link to="/scan" className="navbar__link">Scan Presensi</Link>
           <Link to="/rekap" className="navbar__link">Rekap & Laporan</Link>
           <Link to="/cetak-kartu" className="navbar__link">Cetak Kartu QR</Link>
+          {/* [BARU] Menu pengaturan jam masuk & pulang */}
+          <Link to="/pengaturan" className="navbar__link">Pengaturan Jam</Link>
         </nav>
 
         {/* Content Routes */}
@@ -24,6 +27,8 @@ function App() {
           <Route path="/scan" element={<ScanPresensi />} />
           <Route path="/rekap" element={<DashboardRekap />} />
           <Route path="/cetak-kartu" element={<CetakKartu />} />
+          {/* [BARU] */}
+          <Route path="/pengaturan" element={<PengaturanJam />} />
         </Routes>
       </div>
     </Router>

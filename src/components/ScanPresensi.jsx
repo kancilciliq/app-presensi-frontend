@@ -41,7 +41,8 @@ const ScanNotification = ({ feedback, onClose }) => {
     };
   }, [feedback, onClose]);
 
-  const icons = { success: '✓', late: '✓', duplicate: '!', error: '✕' };
+  // [DIUBAH] ditambah jenis 'pulang' (scan pulang berhasil)
+  const icons = { success: '✓', late: '✓', pulang: '✓', duplicate: '!', error: '✕' };
   const { type, nama, kelas, nis, status, waktu, message } = feedback;
 
   return (
@@ -125,37 +126,40 @@ const ScanPresensi = () => {
     try {
       const res = await axios.post(`${API_URL}/presensi/scan`, { nis: nisScanned });
       const { data } = res.data;
+      // [DIUBAH] Backend menentukan jenis scan (masuk/pulang) dari pengaturan jam
+      const pulang = data.jenis === 'pulang';
       setFeedback({
         id,
-        type: data.status === 'Terlambat' ? 'late' : 'success',
-        title: 'Presensi Berhasil',
+        type: pulang ? 'pulang' : data.status === 'Terlambat' ? 'late' : 'success',
+        title: pulang ? 'Presensi Pulang Berhasil' : 'Presensi Masuk Berhasil',
         nama: data.nama,
         kelas: data.kelas,
         nis: data.nis,
-        status: data.status,
-        waktu: data.waktu_masuk,
+        status: pulang ? 'Pulang' : data.status,
+        waktu: pulang ? data.waktu_pulang : data.waktu_masuk,
       });
     } catch (err) {
       const body = err.response?.data;
 
       if (err.response?.status === 409) {
-        // [BARU] Siswa sudah scan hari ini (aturan 1x scan per hari)
+        // Sudah scan masuk / sudah scan pulang (1x masuk & 1x pulang per hari)
         setFeedback({
           id,
           type: 'duplicate',
-          title: 'Sudah Scan Hari Ini',
+          title: body?.title || 'Sudah Scan Hari Ini', // [DIUBAH] judul dari backend
           nama: body?.data?.nama,
           kelas: body?.data?.kelas,
           nis: body?.data?.nis,
           status: body?.data?.status,
-          waktu: body?.data?.waktu_masuk,
+          waktu: body?.data?.waktu, // [DIUBAH] waktu scan sebelumnya (masuk atau pulang)
           message: body?.message,
         });
       } else {
+        // [DIUBAH] judul bisa dari backend: "Presensi Belum Dibuka", "Belum Scan Masuk", dll.
         setFeedback({
           id,
           type: 'error',
-          title: 'Presensi Gagal',
+          title: body?.title || 'Presensi Gagal',
           message: body?.message || 'Gagal memproses absensi',
         });
       }
@@ -171,6 +175,13 @@ const ScanPresensi = () => {
       // [DIUBAH] cegah baris dobel jika data yang sama datang 2x
       setPresensiList((prev) =>
         prev.some((p) => p.id === dataBaru.id) ? prev : [dataBaru, ...prev]
+      );
+    });
+
+    // [BARU] Saat siswa scan pulang, baris yang sama diperbarui (kolom Waktu Pulang terisi)
+    socket.on('absen_pulang', (dataPulang) => {
+      setPresensiList((prev) =>
+        prev.map((p) => (p.id === dataPulang.id ? { ...p, waktu_pulang: dataPulang.waktu_pulang } : p))
       );
     });
 
@@ -233,6 +244,8 @@ const ScanPresensi = () => {
         <thead>
           <tr>
             <th>Waktu Masuk</th>
+            {/* [BARU] kolom Waktu Pulang */}
+            <th>Waktu Pulang</th>
             <th>NISN</th>
             <th>Nama</th>
             <th>Kelas</th>
@@ -244,6 +257,8 @@ const ScanPresensi = () => {
           {pagination.visibleItems.map((item, index) => (
             <tr key={item.id || index}>
               <td>{new Date(item.waktu_masuk).toLocaleTimeString('id-ID')} WIB</td>
+              {/* [BARU] tanda minus bila belum scan pulang */}
+              <td>{item.waktu_pulang ? `${new Date(item.waktu_pulang).toLocaleTimeString('id-ID')} WIB` : '-'}</td>
               <td>{item.nis}</td>
               <td>{item.nama}</td>
               <td>{item.kelas}</td>
@@ -254,7 +269,7 @@ const ScanPresensi = () => {
           ))}
           {presensiList.length === 0 && (
             <tr>
-              <td colSpan="5" className="text-center">Belum ada yang presensi hari ini.</td>
+              <td colSpan="6" className="text-center">Belum ada yang presensi hari ini.</td>
             </tr>
           )}
         </tbody>

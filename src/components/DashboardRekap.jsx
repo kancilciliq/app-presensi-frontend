@@ -64,7 +64,9 @@ const DashboardRekap = () => {
   const handleExportExcel = () => {
     const dataFormatted = rekapList.map((item, index) => ({
       No: index + 1,
-      Waktu: new Date(item.waktu_masuk).toLocaleString('id-ID'),
+      'Waktu Masuk': new Date(item.waktu_masuk).toLocaleString('id-ID'),
+      // [BARU] kolom waktu pulang pada export Excel
+      'Waktu Pulang': item.waktu_pulang ? new Date(item.waktu_pulang).toLocaleString('id-ID') : '-',
       NIS: item.nis,
       Nama: item.nama,
       Kelas: item.kelas,
@@ -144,6 +146,8 @@ const DashboardRekap = () => {
           <tr>
             <th>No</th>
             <th>Waktu Masuk</th>
+            {/* [BARU] kolom Waktu Pulang */}
+            <th>Waktu Pulang</th>
             <th>NISN</th>
             <th>Nama Siswa</th>
             <th>Kelas</th>
@@ -160,6 +164,8 @@ const DashboardRekap = () => {
               <tr key={item.id || index} className={onCurrentPage ? '' : 'row-hidden-screen'}>
                 <td className="text-center">{index + 1}</td>
                 <td className="text-center">{new Date(item.waktu_masuk).toLocaleString('id-ID')}</td>
+                {/* [BARU] */}
+                <td className="text-center">{item.waktu_pulang ? new Date(item.waktu_pulang).toLocaleString('id-ID') : '-'}</td>
                 <td className="text-center">{item.nis}</td>
                 <td>{item.nama}</td>
                 <td className="text-center">{item.kelas}</td>
@@ -171,7 +177,7 @@ const DashboardRekap = () => {
           })}
           {rekapList.length === 0 && (
             <tr>
-              <td colSpan="6" className="text-center">Data tidak ditemukan pada periode filter ini.</td>
+              <td colSpan="7" className="text-center">Data tidak ditemukan pada periode filter ini.</td>
             </tr>
           )}
         </tbody>
