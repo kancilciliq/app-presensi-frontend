@@ -1,0 +1,53 @@
+/* =====================================================================
+   DashboardRekap.css  -  style halaman Rekap & Laporan
+   [DIUBAH] Dipindahkan dari inline style & <style> di DashboardRekap.jsx
+   ===================================================================== */
+
+.rekap-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Kartu ringkasan */
+.summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.summary__card {
+  flex: 1;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.summary__card h4 { margin: 0; }
+
+.summary__value {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.summary__card--total    { background-color: #0482ff; color: #fff; }
+.summary__card--ontime   { background-color: #d4edda; color: #155724; }
+.summary__card--late     { background-color: #f8d7da; color: #721c24; }
+
+/* [BARU] Pagination: baris di luar halaman aktif disembunyikan di layar
+   tetapi tetap tercetak, jadi laporan cetak/PDF berisi SEMUA data */
+.row-hidden-screen {
+  display: none;
+}
+
+@media print {
+  body { font-size: 12pt; }
+  .table { width: 100%; border-collapse: collapse; }
+  .row-hidden-screen { display: table-row; }
+}

@@ -1,6 +1,14 @@
+/* =====================================================================
+   DashboardRekap.jsx
+   Legenda: [BARU] = baru | [DIUBAH] = diubah | [DIHAPUS] = dibuang
+   ===================================================================== */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import * as XLSX from 'xlsx';
+import Pagination from './Pagination';              // [BARU]
+import usePagination from '../hooks/usePagination'; // [BARU]
+import './DashboardRekap.css';                      // [DIUBAH] style pindah ke CSS
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const DashboardRekap = () => {
@@ -11,6 +19,15 @@ const DashboardRekap = () => {
     endDate: new Date().toISOString().split('T')[0],
     kelas: 'Semua'
   });
+
+  // [BARU] Pagination tabel rekap
+  const pagination = usePagination(rekapList, 10);
+
+  // [BARU] Ubah filter sekaligus kembali ke halaman 1
+  const updateFilter = (patch) => {
+    setFilter((prev) => ({ ...prev, ...patch }));
+    pagination.setPage(1);
+  };
 
   // Fetch daftar kelas unik dari backend
   useEffect(() => {
@@ -38,12 +55,12 @@ const DashboardRekap = () => {
     fetchRekap();
   }, [filter]);
 
-  // Statistik Ringkasan
+  // Statistik Ringkasan (dihitung dari SEMUA data, bukan hanya halaman aktif)
   const totalHadir = rekapList.length;
   const tepatWaktu = rekapList.filter((item) => item.status === 'Tepat Waktu').length;
   const terlambat = rekapList.filter((item) => item.status === 'Terlambat').length;
 
-  // Handler Export Excel
+  // Handler Export Excel (mengekspor SEMUA data)
   const handleExportExcel = () => {
     const dataFormatted = rekapList.map((item, index) => ({
       No: index + 1,
@@ -66,17 +83,17 @@ const DashboardRekap = () => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif', color: '#111111', backgroundColor: '#ffff' }}>
-      <h2 className="no-print" style={{ color: '#111111' }}>Dashboard Rekapitulasi Presensi</h2>
+    <div className="page">
+      <h2 className="no-print">Dashboard Rekapitulasi Presensi</h2>
 
       {/* Filter Section */}
-      <div className="no-print" style={{ display: 'flex', gap: '15px', marginBottom: '20px', alignItems: 'center', backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px' }}>
+      <div className="rekap-filter no-print">
         <div>
           <label>Dari Tanggal: </label>
           <input
             type="date"
             value={filter.startDate}
-            onChange={(e) => setFilter({ ...filter, startDate: e.target.value })}
+            onChange={(e) => updateFilter({ startDate: e.target.value })}
           />
         </div>
         <div>
@@ -84,47 +101,47 @@ const DashboardRekap = () => {
           <input
             type="date"
             value={filter.endDate}
-            onChange={(e) => setFilter({ ...filter, endDate: e.target.value })}
+            onChange={(e) => updateFilter({ endDate: e.target.value })}
           />
         </div>
         <div>
           <label>Kelas: </label>
-          <select value={filter.kelas} onChange={(e) => setFilter({ ...filter, kelas: e.target.value })}>
+          <select value={filter.kelas} onChange={(e) => updateFilter({ kelas: e.target.value })}>
             <option value="Semua">Semua Kelas</option>
             {kelasList.map((k) => (
               <option key={k} value={k}>{k}</option>
             ))}
           </select>
         </div>
-        <button onClick={handleExportExcel} style={{ backgroundColor: '#28a745', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer' }}>
-           Export Excel
+        <button type="button" className="btn btn--success" onClick={handleExportExcel}>
+          Export Excel
         </button>
-        <button onClick={handlePrint} style={{ backgroundColor: '#007bff', color: '#fff', border: 'none', padding: '8px 15px', borderRadius: '4px', cursor: 'pointer' }}>
+        <button type="button" className="btn btn--primary" onClick={handlePrint}>
           Cetak / PDF
         </button>
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ flex: 1, backgroundColor: '#0482ff', padding: '15px', borderRadius: '8px', textAlign: 'center' }}>
+      <div className="summary">
+        <div className="summary__card summary__card--total">
           <h4>Total Kehadiran</h4>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>{totalHadir}</p>
+          <p className="summary__value">{totalHadir}</p>
         </div>
-        <div style={{ flex: 1, backgroundColor: '#d4edda', padding: '15px', borderRadius: '8px', textAlign: 'center', color: '#155724' }}>
+        <div className="summary__card summary__card--ontime">
           <h4>Tepat Waktu</h4>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>{tepatWaktu}</p>
+          <p className="summary__value">{tepatWaktu}</p>
         </div>
-        <div style={{ flex: 1, backgroundColor: '#f8d7da', padding: '15px', borderRadius: '8px', textAlign: 'center', color: '#721c24' }}>
+        <div className="summary__card summary__card--late">
           <h4>Terlambat</h4>
-          <p style={{ fontSize: '24px', fontWeight: 'bold', margin: '5px 0' }}>{terlambat}</p>
+          <p className="summary__value">{terlambat}</p>
         </div>
       </div>
 
       {/* Table Data */}
       <h3>Detail Data Presensi</h3>
-      <table border="1" cellPadding="10" style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <table className="table">
         <thead>
-          <tr style={{ backgroundColor: '#f2f2f2' }}>
+          <tr>
             <th>No</th>
             <th>Waktu Masuk</th>
             <th>NISN</th>
@@ -134,34 +151,43 @@ const DashboardRekap = () => {
           </tr>
         </thead>
         <tbody>
-          {rekapList.map((item, index) => (
-            <tr key={item.id || index}>
-              <td style={{ textAlign: 'center' }}>{index + 1}</td>
-              <td style={{ textAlign: 'center' }}>{new Date(item.waktu_masuk).toLocaleString('id-ID')}</td>
-              <td style={{ textAlign: 'center' }}>{item.nis}</td>
-              <td>{item.nama}</td>
-              <td style={{ textAlign: 'center' }}>{item.kelas}</td>
-              <td style={{ textAlign: 'center', color: item.status === 'Terlambat' ? 'red' : 'green', fontWeight: 'bold' }}>
-                {item.status}
-              </td>
-            </tr>
-          ))}
+          {/* [DIUBAH] Semua baris dirender; baris di luar halaman aktif diberi class
+              row-hidden-screen (tersembunyi di layar, tetap tampil saat cetak) */}
+          {rekapList.map((item, index) => {
+            const onCurrentPage =
+              index >= pagination.startIndex && index < pagination.startIndex + pagination.pageSize;
+            return (
+              <tr key={item.id || index} className={onCurrentPage ? '' : 'row-hidden-screen'}>
+                <td className="text-center">{index + 1}</td>
+                <td className="text-center">{new Date(item.waktu_masuk).toLocaleString('id-ID')}</td>
+                <td className="text-center">{item.nis}</td>
+                <td>{item.nama}</td>
+                <td className="text-center">{item.kelas}</td>
+                <td className={`text-center status ${item.status === 'Terlambat' ? 'status--terlambat' : 'status--tepat'}`}>
+                  {item.status}
+                </td>
+              </tr>
+            );
+          })}
           {rekapList.length === 0 && (
             <tr>
-              <td colSpan="6" style={{ textAlign: 'center' }}>Data tidak ditemukan pada periode filter ini.</td>
+              <td colSpan="6" className="text-center">Data tidak ditemukan pada periode filter ini.</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* Print CSS styling */}
-      <style>{`
-        @media print {
-          .no-print { display: none !important; }
-          body { font-size: 12pt; }
-          table { width: 100%; border-collapse: collapse; }
-        }
-      `}</style>
+      {/* [BARU] Navigasi halaman */}
+      <Pagination
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        totalItems={pagination.totalItems}
+        pageSize={pagination.pageSize}
+        onPageChange={pagination.setPage}
+        onPageSizeChange={pagination.setPageSize}
+      />
+
+      {/* [DIHAPUS] <style>{`@media print ...`}</style> -> pindah ke DashboardRekap.css & App.css */}
     </div>
   );
 };

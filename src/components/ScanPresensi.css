@@ -1,0 +1,136 @@
+/* =====================================================================
+   ScanPresensi.css  -  style halaman Scan Presensi  [BARU]
+   ===================================================================== */
+
+/* Area kamera */
+.scan-reader {
+  width: 100%;
+  max-width: 400px;
+  min-height: 120px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.scan-camera-error {
+  max-width: 400px;
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: #fdecee;
+  color: #842029;
+  font-size: 14px;
+}
+
+/* ---------- Notifikasi scan (popup interaktif) ---------- */
+.scan-notif-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: scan-fade-in 0.15s ease-out;
+}
+
+.scan-notif {
+  --notif-color: var(--color-success); /* warna aksen, diganti per jenis */
+  position: relative;
+  width: 360px;
+  max-width: 90vw;
+  padding: 28px 24px 24px;
+  background-color: #fff;
+  border-top: 8px solid var(--notif-color);
+  border-radius: 12px;
+  text-align: center;
+  overflow: hidden;
+  animation: scan-pop-in 0.2s ease-out;
+}
+
+/* Jenis notifikasi */
+.scan-notif--success   { --notif-color: var(--color-success); }
+.scan-notif--late      { --notif-color: #fd7e14; }
+.scan-notif--duplicate { --notif-color: var(--color-warning); }
+.scan-notif--error     { --notif-color: var(--color-danger); }
+
+.scan-notif__icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background-color: var(--notif-color);
+  color: #fff;
+  font-size: 40px;
+  line-height: 72px;
+  font-weight: bold;
+}
+
+.scan-notif--duplicate .scan-notif__icon {
+  color: var(--color-text);
+}
+
+.scan-notif__title {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+
+.scan-notif__name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.scan-notif__detail {
+  margin-top: 4px;
+  color: #555;
+  font-size: 14px;
+}
+
+.scan-notif__badge {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background-color: var(--notif-color);
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.scan-notif--duplicate .scan-notif__badge {
+  color: var(--color-text);
+}
+
+.scan-notif__message {
+  margin-top: 8px;
+  font-size: 15px;
+}
+
+.scan-notif__close {
+  margin-top: 18px;
+  width: 100%;
+}
+
+/* Garis waktu mundur di dasar popup. Durasi 5s HARUS sama dengan
+   AUTO_CLOSE_MS (5000) di ScanPresensi.jsx */
+.scan-notif__timer {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--notif-color);
+  transform-origin: left;
+  animation: scan-timer 5s linear forwards;
+}
+
+@keyframes scan-timer   { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes scan-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scan-pop-in  { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Hormati pengguna yang mematikan animasi di sistemnya */
+@media (prefers-reduced-motion: reduce) {
+  .scan-notif-overlay,
+  .scan-notif { animation: none; }
+}

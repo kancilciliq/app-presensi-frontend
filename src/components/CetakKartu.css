@@ -1,0 +1,161 @@
+/* =====================================================================
+   CetakKartu.css  -  style halaman Cetak Kartu QR
+   [DIUBAH] Dipindahkan dari <style>{`...`}</style> di CetakKartu.jsx
+   ===================================================================== */
+
+.card-pages {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+/* [DIUBAH] Di layar hanya halaman yang aktif yang tampil (pagination).
+   Halaman lain disembunyikan, tapi tetap ada di DOM supaya bisa dicetak. */
+.card-page {
+  display: none;
+}
+
+.card-page.is-current {
+  display: contents;
+}
+
+.card-item {
+  border: 2px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  text-align: center;
+  border-bottom: 2px solid #333;
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.card-header p {
+  margin: 2px 0 0 0;
+  font-size: 9px;
+  color: #555;
+  font-weight: bold;
+}
+
+.card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bio-box p {
+  margin: 3px 0;
+  font-size: 12px;
+}
+
+.bio-box p.nama {
+  font-size: 13px;
+  color: #007bff;
+}
+
+.card-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 30px;
+}
+
+/* ---------- Cetak A4: 16 kartu per lembar (2 kolom x 8 baris) ----------
+   [DIUBAH] sebelumnya 2 kolom x 4 baris (8 kartu) */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  html, body, #root {
+    width: auto !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+
+  #root { display: block !important; }
+  .print-root { padding: 0 !important; }
+  .card-pages { display: block; }
+
+  /* [DIUBAH - PERBAIKAN BUG] Selector ditulis juga dengan .is-current.
+     Sebelumnya aturan di layar `.card-page.is-current { display: contents }`
+     lebih kuat daripada `.card-page { display: grid }` sehingga halaman
+     yang sedang dibuka (halaman 1) tercetak 1 kolom, tidak seperti halaman lain. */
+  .card-page,
+  .card-page.is-current {
+    height: 275mm; /* tinggi area cetak A4 (297mm - margin 2x10mm) dikurangi sedikit agar tidak melimpah ke halaman kosong */
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr)); 
+    gap: 3mm;
+    break-after: page;
+    page-break-after: always;
+  }
+
+  .card-page:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* [BARU] Mode "Cetak Halaman Ini": halaman lain tidak ikut tercetak */
+  .print-current .card-page:not(.is-current) {
+    display: none;
+  }
+
+  .print-current .card-page.is-current {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  /* [DIUBAH] Kartu diperkecil agar muat 8 baris per lembar */
+  .card-item {
+    min-width: 0;
+    overflow: hidden;
+    padding: 3mm 4mm;
+    border-width: 1px;
+    border-radius: 3mm;
+    box-shadow: none;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .card-header {
+    border-bottom-width: 1px;
+    padding-bottom: 1mm;
+    margin-bottom: 2mm;
+  }
+
+  .card-header h3 { font-size: 12pt; }
+  .card-header p  { font-size: 8pt; margin-top: 0; }
+
+  .card-body { gap: 3mm; }
+
+  /* QR di layar 100px, saat cetak dikecilkan jadi 16mm (masih mudah discan) */
+  .qr-box canvas {
+    display: block;
+    width: 30mm !important;
+    height: 30mm !important;
+  }
+
+  .bio-box p { margin: 0.5mm 0; font-size: 11pt; }
+  .bio-box p.nama { font-size: 11pt; }
+}
+
+/* Dropdown filter di toolbar tidak perlu selebar form */
+.toolbar__right .form__input {
+  width: auto;
+  margin-top: 0;
+}
