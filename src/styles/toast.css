@@ -1,0 +1,50 @@
+/* =====================================================================
+   toast.css - notifikasi tambah / edit / hapus (gaya dari mapel.css)
+   ===================================================================== */
+.toast-stack {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 280px;
+  max-width: 400px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  animation: toast-masuk 0.25s ease-out;
+}
+.toast--ok { background: #16a34a; }
+.toast--error { background: #dc2626; }
+.toast__icon {
+  flex: 0 0 24px; height: 24px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  display: grid; place-items: center; font-weight: 700;
+}
+.toast__body { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; line-height: 1.4; }
+.toast__close {
+  margin-left: auto; background: none; border: 0; color: #fff;
+  font-size: 20px; line-height: 1; cursor: pointer; opacity: 0.8;
+}
+.toast__close:hover { opacity: 1; }
+
+@keyframes toast-masuk {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 600px) {
+  .toast-stack { top: 10px; left: 10px; right: 10px; }
+  .toast { min-width: 0; max-width: none; width: 100%; }
+}
+@media print { .toast-stack { display: none; } }

@@ -7,7 +7,6 @@ import axios from 'axios';
 import { QRCodeCanvas } from 'qrcode.react';
 import Pagination from './Pagination';              // [BARU]
 import usePagination from '../hooks/usePagination'; // [BARU]
-import './CetakKartu.css';                          // [DIUBAH] style pindah ke CSS
 
 const API_URL = import.meta.env.VITE_API_URL;
 

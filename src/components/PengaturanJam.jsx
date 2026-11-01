@@ -7,11 +7,12 @@
    ===================================================================== */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import './PengaturanJam.css';
+import { useToast } from '../toast/useToast';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const PengaturanJam = () => {
+  const toast = useToast();
   const [form, setForm] = useState({
     jam_masuk_mulai: '',
     jam_masuk_batas: '',
@@ -20,7 +21,6 @@ const PengaturanJam = () => {
   const [zona, setZona] = useState('WIB');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [notif, setNotif] = useState(null); // { type: 'success' | 'error', text }
 
   // Ambil pengaturan saat halaman dibuka
   useEffect(() => {
@@ -30,13 +30,12 @@ const PengaturanJam = () => {
         setForm({ jam_masuk_mulai, jam_masuk_batas, jam_pulang_mulai });
         setZona(zona_waktu || 'WIB');
       })
-      .catch(() => setNotif({ type: 'error', text: 'Gagal memuat pengaturan dari server.' }))
+      .catch(() => toast.gagal('Gagal memuat', 'Pengaturan tidak dapat dimuat dari server.'))
       .finally(() => setLoading(false));
-  }, []);
+  }, [toast]);
 
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-    setNotif(null);
   };
 
   const handleSubmit = async (e) => {
@@ -44,18 +43,18 @@ const PengaturanJam = () => {
 
     // Validasi di sisi layar (format "HH:MM" bisa dibandingkan sebagai teks)
     if (form.jam_masuk_mulai >= form.jam_masuk_batas) {
-      return setNotif({ type: 'error', text: 'Jam masuk dibuka harus lebih awal dari batas tepat waktu.' });
+      return toast.gagal('Jam tidak valid', 'Jam masuk dibuka harus lebih awal dari batas tepat waktu.');
     }
     if (form.jam_masuk_batas >= form.jam_pulang_mulai) {
-      return setNotif({ type: 'error', text: 'Jam pulang harus lebih akhir dari batas tepat waktu.' });
+      return toast.gagal('Jam tidak valid', 'Jam pulang harus lebih akhir dari batas tepat waktu.');
     }
 
     setSaving(true);
     try {
       const res = await axios.put(`${API_URL}/presensi/pengaturan`, form);
-      setNotif({ type: 'success', text: res.data.message || 'Pengaturan berhasil disimpan.' });
+      toast.sukses('Berhasil diperbarui', res.data.message || 'Pengaturan berhasil disimpan.');
     } catch (err) {
-      setNotif({ type: 'error', text: err.response?.data?.message || 'Gagal menyimpan pengaturan.' });
+      toast.gagal('Gagal menyimpan', err.response?.data?.message || 'Gagal menyimpan pengaturan.');
     } finally {
       setSaving(false);
     }
@@ -65,7 +64,7 @@ const PengaturanJam = () => {
 
   return (
     <div className="page">
-      <h2>Pengaturan Jam Presensi</h2>
+      <div className="page-header"><h2>Pengaturan Jam Presensi</h2></div>
       <p className="setting-intro">
         Semua jam memakai zona waktu <strong>{zona}</strong>. Perubahan langsung berlaku untuk scan berikutnya.
       </p>
@@ -129,10 +128,6 @@ const PengaturanJam = () => {
                 <li>Mulai {form.jam_pulang_mulai}: scan <strong>pulang</strong> (wajib sudah scan masuk)</li>
               </ul>
             </div>
-          )}
-
-          {notif && (
-            <p className={`setting-alert setting-alert--${notif.type}`} role="alert">{notif.text}</p>
           )}
 
           <div className="modal__actions">

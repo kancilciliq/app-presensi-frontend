@@ -1,0 +1,11 @@
+/* =====================================================================
+   auth.css - halaman login & status memuat (gabungan auth.css + Login.css)
+   ===================================================================== */
+.auth-memuat { padding: 40px; text-align: center; }
+
+.login { min-height: 100svh; display: flex; align-items: center; justify-content: center; background: var(--color-primary-soft); padding: 16px; }
+.login__card { background: #fff; width: 380px; max-width: 100%; padding: 28px; border-radius: 14px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1); }
+.login__logo { display: block; height: 72px; margin: 0 auto 10px; }
+.login__title { margin: 0; text-align: center; font-size: 1.2rem; }
+.login__sub { margin: 4px 0 18px; text-align: center; font-size: 0.85rem; color: var(--color-text-soft); }
+.login__card .btn { width: 100%; }

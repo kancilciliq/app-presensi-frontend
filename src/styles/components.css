@@ -1,0 +1,136 @@
+/* =====================================================================
+   components.css - komponen bersama: tombol, tabel, form, modal,
+   pagination, badge, alert. (dulu: App.css)
+   ===================================================================== */
+
+/* ---------- Toolbar ---------- */
+.toolbar { margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.toolbar--panel { background: var(--color-surface); padding: 14px 16px; border-radius: var(--radius); box-shadow: var(--shadow); }
+.toolbar__title { margin: 0; }
+.toolbar__right { margin-left: auto; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+/* ---------- Tombol ---------- */
+.btn {
+  display: inline-block;
+  border: 1px solid transparent;
+  padding: 9px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #fff;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.3;
+  transition: filter 0.15s, background 0.15s;
+}
+.btn:hover:not(:disabled) { filter: brightness(0.93); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn--primary { background: var(--color-primary); }
+.btn--success { background: var(--color-success); }
+.btn--danger  { background: var(--color-danger); }
+.btn--warning { background: var(--color-warning); color: #1f2933; }
+.btn--ghost   { background: #fff; color: var(--color-text); border-color: #cfd6dd; }
+.btn--sm { padding: 5px 12px; font-size: 0.88rem; }
+
+.aksi { display: inline-flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+
+/* ---------- Tabel (bisa digeser ke samping di HP) ---------- */
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+.table { width: 100%; border-collapse: collapse; min-width: 560px; }
+.table th, .table td { padding: 11px 14px; border-bottom: 1px solid var(--color-border); text-align: left; }
+.table th { background: var(--color-muted); font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: #374151; white-space: nowrap; }
+.table tbody tr:hover { background: #fafbfc; }
+.table td.text-center, .table th.text-center { text-align: center; }
+.text-center { text-align: center; }
+
+.status { font-weight: 700; }
+.status--tepat { color: green; }
+.status--terlambat { color: red; }
+
+/* ---------- Form ---------- */
+.form { display: flex; flex-direction: column; gap: 12px; }
+.form__label { font-size: 0.8rem; font-weight: 500; color: #374151; display: block; }
+.form__input,
+.rekap-filter input, .rekap-filter select,
+.pagination__size select {
+  width: 100%;
+  padding: 9px 12px;
+  margin-top: 4px;
+  background: #fff;
+  color: var(--color-text);
+  border: 1px solid #cfd6dd;
+  border-radius: 8px;
+}
+.form__input:focus,
+.rekap-filter input:focus, .rekap-filter select:focus {
+  outline: 2px solid var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+.form__input--readonly { background: var(--color-muted); }
+.form__hint { display: block; margin-top: 4px; color: var(--color-text-soft); font-size: 0.78rem; }
+.form__error { color: #842029; background: #fdecee; padding: 9px 12px; border-radius: 8px; font-size: 0.9rem; }
+.form__ok { color: #0f5132; background: #e1f4ea; padding: 9px 12px; border-radius: 8px; font-size: 0.9rem; }
+.form__warn { color: #664d03; background: #fff3cd; padding: 9px 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 10px; }
+
+/* ---------- Modal ---------- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  padding: 12px;
+  z-index: 1500;
+}
+.modal {
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 420px;
+  max-width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  color: var(--color-text);
+}
+.modal__actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.modal--danger { border-top: 6px solid var(--color-danger); }
+.modal__warning { background: #fdecee; color: #842029; padding: 10px 12px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 12px; }
+
+/* ---------- Badge ---------- */
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; background: var(--color-muted); }
+.badge--admin { background: #dbeafe; color: #1e40af; }
+.badge--wali_kelas { background: #dcfce7; color: #166534; }
+.badge--guru { background: #fef3c7; color: #92400e; }
+.badge--off { background: #fee2e2; color: #991b1b; }
+
+/* ---------- Pagination ---------- */
+.pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; font-size: 0.9rem; }
+.pagination__info { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; }
+.pagination__size { display: flex; align-items: center; gap: 6px; }
+.pagination__size select { width: auto; margin-top: 0; padding: 5px 8px; }
+.pagination__controls { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.pagination__btn { min-width: 36px; padding: 6px 10px; background: #fff; color: var(--color-text); border: 1px solid #cfd6dd; border-radius: 8px; cursor: pointer; }
+.pagination__btn:hover:not(:disabled) { background: var(--color-muted); }
+.pagination__btn.is-active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; font-weight: 700; }
+.pagination__btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.pagination__dots { padding: 0 4px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 600px) {
+  .toolbar__right { margin-left: 0; width: 100%; }
+  .toolbar__right .btn { flex: 1; }
+  .pagination { justify-content: center; }
+  .pagination__info { justify-content: center; }
+  .pagination__btn { min-width: 32px; padding: 6px 8px; }
+  .modal { padding: 18px; }
+  .modal__actions .btn { flex: 1; }
+}
+
+@media print { .no-print { display: none !important; } }

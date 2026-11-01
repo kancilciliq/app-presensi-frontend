@@ -9,6 +9,8 @@ import * as XLSX from 'xlsx';
 import { QRCodeCanvas } from 'qrcode.react';
 import Pagination from './Pagination';              // [BARU]
 import usePagination from '../hooks/usePagination'; // [BARU]
+import { useAuth } from '../auth/useAuth';          // [BARU] tombol ubah data hanya untuk admin
+import { useToast } from '../toast/useToast';       // [BARU] notifikasi toast
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,6 +18,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 const KATA_KONFIRMASI = 'HAPUS';
 
 const DataSiswa = () => {
+  const { user } = useAuth();
+  const toast = useToast();
+  const isAdmin = user?.role === 'admin'; // [BARU] wali kelas hanya melihat data kelasnya
+  const tampilQR = isAdmin;               // [BARU] kolom QR Code hanya untuk admin (wali kelas tidak melihatnya)
   const [siswa, setSiswa] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState(null);
@@ -67,12 +73,12 @@ const DataSiswa = () => {
     e.preventDefault();
     try {
       await axios.post(`${API_URL}/siswa`, addData);
-      alert('Data siswa berhasil ditambahkan!');
+      toast.sukses('Berhasil ditambahkan', 'Data siswa berhasil ditambahkan.');
       setAddData({ nis: '', nama: '', kelas: '', no_wa_ortu: '' });
       setShowAddModal(false);
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menambahkan data siswa');
+      toast.gagal('Gagal menambahkan', error.response?.data?.message || 'Gagal menambahkan data siswa.');
     }
   };
 
@@ -117,14 +123,14 @@ const DataSiswa = () => {
 
         if (formattedData.length > 0) {
           await axios.post(`${API_URL}/siswa/import`, { dataSiswa: formattedData });
-          alert('Data berhasil di-import!');
+          toast.sukses('Import berhasil', `${formattedData.length} data siswa berhasil di-import.`);
           fetchData();
         } else {
-          alert('Format data Excel kosong atau tidak sesuai.');
+          toast.gagal('Import gagal', 'Format data Excel kosong atau tidak sesuai.');
         }
       } catch (error) {
         console.error('Error saat import:', error);
-        alert('Gagal meng-import data.');
+        toast.gagal('Import gagal', 'Gagal meng-import data.');
       } finally {
         setLoading(false);
         e.target.value = ''; // [BARU] reset input agar file yang sama bisa dipilih lagi
@@ -137,9 +143,10 @@ const DataSiswa = () => {
     if (window.confirm(`Yakin ingin menghapus data NIS: ${nis}?`)) {
       try {
         await axios.delete(`${API_URL}/siswa/${nis}`);
+        toast.sukses('Berhasil dihapus', `Data siswa NIS ${nis} dihapus.`);
         fetchData();
       } catch (error) {
-        alert('Gagal menghapus data');
+        toast.gagal('Gagal menghapus', 'Data siswa tidak dapat dihapus.');
       }
     }
   };
@@ -152,12 +159,12 @@ const DataSiswa = () => {
       const res = await axios.delete(`${API_URL}/siswa`, {
         data: { konfirmasi: KATA_KONFIRMASI }
       });
-      alert(res.data.message || 'Semua data siswa berhasil dihapus');
+      toast.sukses('Berhasil dihapus', res.data.message || 'Semua data siswa berhasil dihapus.');
       closeDeleteAllModal();
       pagination.setPage(1);
       fetchData();
     } catch (error) {
-      alert(error.response?.data?.message || 'Gagal menghapus semua data siswa');
+      toast.gagal('Gagal menghapus', error.response?.data?.message || 'Gagal menghapus semua data siswa.');
     } finally {
       setDeletingAll(false);
     }
@@ -182,18 +189,19 @@ const DataSiswa = () => {
         no_wa_ortu: editData.no_wa_ortu
       });
       setEditData(null);
+      toast.sukses('Berhasil diperbarui', 'Data siswa berhasil diperbarui.');
       fetchData();
     } catch (error) {
-      alert('Gagal memperbarui data siswa');
+      toast.gagal('Gagal memperbarui', error.response?.data?.message || 'Gagal memperbarui data siswa.');
     }
   };
 
   return (
     <div className="page">
-      <h2>Manajemen Data Siswa</h2>
+      <div className="page-header"><h2>Manajemen Data Siswa</h2></div>
 
-      {/* Header Actions */}
-      <div className="toolbar">
+      {/* Header Actions (khusus admin) */}
+      {isAdmin && <div className="toolbar toolbar--panel">
         <label>
           <strong>Import Data (Excel): </strong>
           <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} disabled={loading} />
@@ -219,9 +227,9 @@ const DataSiswa = () => {
         </button>
 
         {loading && <span> Proses memuat data...</span>}
-      </div>
+      </div>}
 
-      <table className="table">
+      <div className="table-wrap"><table className="table">
         <thead>
           <tr>
             <th>No</th>
@@ -229,8 +237,8 @@ const DataSiswa = () => {
             <th>Nama Lengkap</th>
             <th>Kelas</th>
             <th>No WA Ortu</th>
-            <th>QR Code (NIS)</th>
-            <th>Aksi</th>
+            {tampilQR && <th>QR Code (NIS)</th>}
+            {isAdmin && <th>Aksi</th>}
           </tr>
         </thead>
         <tbody>
@@ -241,28 +249,34 @@ const DataSiswa = () => {
               <td>{item.nama}</td>
               <td className="text-center">{item.kelas}</td>
               <td>{item.no_wa_ortu}</td>
-              <td className="text-center">
-                <QRCodeCanvas value={item.nis} size={64} />
-              </td>
-              <td className="text-center">
-                <button type="button" className="btn btn--sm btn--warning" onClick={() => handleEditClick(item)}>
-                  Edit
-                </button>{' '}
-                <button type="button" className="btn btn--sm btn--danger" onClick={() => handleDelete(item.nis)}>
-                  Hapus
-                </button>
-              </td>
+              {tampilQR && (
+                <td className="text-center">
+                  <QRCodeCanvas value={item.nis} size={64} />
+                </td>
+              )}
+              {isAdmin && (
+                <td className="text-center">
+                  <div className="aksi">
+                    <button type="button" className="btn btn--sm btn--warning" onClick={() => handleEditClick(item)}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn btn--sm btn--danger" onClick={() => handleDelete(item.nis)}>
+                      Hapus
+                    </button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
           {siswa.length === 0 && (
             <tr>
-              <td colSpan="7" className="text-center">
-                Belum ada data siswa. Silakan unduh template dan import file Excel.
+              <td colSpan={5 + (tampilQR ? 1 : 0) + (isAdmin ? 1 : 0)} className="text-center">
+                {isAdmin ? 'Belum ada data siswa. Silakan unduh template dan import file Excel.' : 'Belum ada data siswa untuk kelas Anda.'}
               </td>
             </tr>
           )}
         </tbody>
-      </table>
+      </table></div>
 
       {/* [DIUBAH] Pagination lama diganti komponen <Pagination /> (nomor halaman + pilih jumlah baris) */}
       <Pagination

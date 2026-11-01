@@ -9,15 +9,17 @@
   gap: 15px;
   margin-bottom: 20px;
   align-items: center;
-  background-color: #f8f9fa;
+  background-color: var(--color-surface);
   padding: 15px;
-  border-radius: 8px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
 }
 
 /* Kartu ringkasan */
 .summary {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   margin-bottom: 20px;
 }
 
@@ -36,7 +38,7 @@
   margin: 5px 0;
 }
 
-.summary__card--total    { background-color: #0482ff; color: #fff; }
+.summary__card--total    { background-color: var(--color-primary); color: #fff; }
 .summary__card--ontime   { background-color: #d4edda; color: #155724; }
 .summary__card--late     { background-color: #f8d7da; color: #721c24; }
 
@@ -50,4 +52,13 @@
   body { font-size: 12pt; }
   .table { width: 100%; border-collapse: collapse; }
   .row-hidden-screen { display: table-row; }
+}
+
+.rekap-filter > div { min-width: 0; }
+.rekap-filter label { display: block; font-size: 0.8rem; font-weight: 500; }
+
+@media (max-width: 700px) {
+  .summary { grid-template-columns: 1fr; gap: 10px; }
+  .rekap-filter { flex-direction: column; align-items: stretch; }
+  .rekap-filter .btn { width: 100%; }
 }

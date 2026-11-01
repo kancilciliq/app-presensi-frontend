@@ -5,13 +5,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
+import { getToken } from '../auth/token'; // [BARU] socket butuh token login
 // [DIUBAH] Html5QrcodeScanner (UI bawaan) diganti Html5Qrcode (kontrol manual).
 // Html5QrcodeScanner.clear() bersifat async, sehingga di React StrictMode
 // render() kedua jalan sebelum clear() pertama selesai -> muncul 2 kamera.
 import { Html5Qrcode } from 'html5-qrcode';
 import Pagination from './Pagination';       // [BARU]
 import usePagination from '../hooks/usePagination'; // [BARU]
-import './ScanPresensi.css';                 // [BARU] style dipindah ke file CSS
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -170,7 +170,7 @@ const ScanPresensi = () => {
   useEffect(() => {
     axios.get(`${API_URL}/presensi/hari-ini`).then((res) => setPresensiList(res.data));
 
-    const socket = io(`${API_URL.replace('/api', '')}`);
+    const socket = io(`${API_URL.replace('/api', '')}`, { auth: { token: getToken() } }); // [DIUBAH] kirim token login
     socket.on('absen_baru', (dataBaru) => {
       // [DIUBAH] cegah baris dobel jika data yang sama datang 2x
       setPresensiList((prev) =>
@@ -240,7 +240,7 @@ const ScanPresensi = () => {
 
       {/* Tabel Riwayat */}
       <h3>Riwayat Presensi Hari Ini</h3>
-      <table className="table">
+      <div className="table-wrap"><table className="table">
         <thead>
           <tr>
             <th>Waktu Masuk</th>
@@ -273,7 +273,7 @@ const ScanPresensi = () => {
             </tr>
           )}
         </tbody>
-      </table>
+      </table></div>
 
       {/* [BARU] Navigasi halaman */}
       <Pagination

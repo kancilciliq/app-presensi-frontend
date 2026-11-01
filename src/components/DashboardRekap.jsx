@@ -7,7 +7,6 @@ import axios from 'axios';
 import * as XLSX from 'xlsx';
 import Pagination from './Pagination';              // [BARU]
 import usePagination from '../hooks/usePagination'; // [BARU]
-import './DashboardRekap.css';                      // [DIUBAH] style pindah ke CSS
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -141,7 +140,7 @@ const DashboardRekap = () => {
 
       {/* Table Data */}
       <h3>Detail Data Presensi</h3>
-      <table className="table">
+      <div className="table-wrap"><table className="table">
         <thead>
           <tr>
             <th>No</th>
@@ -181,7 +180,7 @@ const DashboardRekap = () => {
             </tr>
           )}
         </tbody>
-      </table>
+      </table></div>
 
       {/* [BARU] Navigasi halaman */}
       <Pagination

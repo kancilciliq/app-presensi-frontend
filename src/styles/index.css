@@ -1,0 +1,15 @@
+/* =====================================================================
+   styles/index.css - SATU pintu semua style aplikasi.
+   Dipanggil sekali dari main.jsx. Menambah halaman baru? Buat file CSS
+   di folder ini lalu daftarkan di sini.
+   ===================================================================== */
+@import './base.css';
+@import './layout.css';
+@import './components.css';
+@import './toast.css';
+@import './auth.css';
+@import './mapel.css';
+@import './pengaturan-jam.css';
+@import './rekap.css';
+@import './cetak-kartu.css';
+@import './scan-presensi.css';
