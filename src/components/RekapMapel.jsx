@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import { useAuth } from '../auth/useAuth';
 import { useToast } from '../toast/useToast';
 import { NAMA_SEKOLAH, namaFile, susunRingkasan, susunSesi, tglID } from '../lib/rekapMapel';
+import { NAMA_BULAN, labelBulan, unduhRekapBulanan } from '../lib/rekapBulanan';
+import RekapBulanan from './RekapBulanan';
 
 const BATAS_SESI = 1000; // sama dengan LIMIT di backend
 
@@ -29,6 +31,14 @@ export default function RekapMapel() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // ---- Tab Rekap Bulanan (filternya terpisah: bulan, tahun, kelas) ----
+  const sekarang = useMemo(() => new Date(), []);
+  const [fb, setFb] = useState({ bln: sekarang.getMonth() + 1, thn: sekarang.getFullYear(), kelas: 'Semua' });
+  const [bulanan, setBulanan] = useState(null);
+  const [loadingBulanan, setLoadingBulanan] = useState(false);
+  const daftarTahun = useMemo(() => Array.from({ length: 4 }, (_, i) => sekarang.getFullYear() - i), [sekarang]);
+  const kodeBulan = `${fb.thn}-${dua(fb.bln)}`;
+
   useEffect(() => {
     axios.get(`${API_URL}/mapel/daftar`).then((r) => setMapelList(r.data)).catch(() => {});
     if (isAdmin) axios.get(`${API_URL}/pengguna/kelas`).then((r) => setKelasList(r.data)).catch(() => {});
@@ -49,6 +59,21 @@ export default function RekapMapel() {
 
   useEffect(() => { muat(); }, [muat]);
 
+  const muatBulanan = useCallback(async () => {
+    setLoadingBulanan(true);
+    try {
+      const res = await axios.get(`${API_URL}/mapel/rekap/bulanan`, { params: { bulan: kodeBulan, kelas: isAdmin ? fb.kelas : undefined } });
+      setBulanan(res.data);
+    } catch (err) {
+      setBulanan(null);
+      toast.gagal('Gagal memuat rekap bulanan', err.response?.data?.message || 'Terjadi kesalahan pada server.');
+    } finally {
+      setLoadingBulanan(false);
+    }
+  }, [kodeBulan, fb.kelas, isAdmin, toast]);
+
+  useEffect(() => { if (tab === 'bulanan') muatBulanan(); }, [tab, muatBulanan]);
+
   // Keterangan filter (dipakai di judul Excel dan kop cetak)
   const meta = useMemo(() => ({
     mulai: filter.mulai,
@@ -58,6 +83,11 @@ export default function RekapMapel() {
   }), [filter, isAdmin, user, mapelList]);
 
   const unduhExcel = () => {
+    if (tab === 'bulanan') {
+      unduhRekapBulanan(bulanan, { label: labelBulan(fb.bln, fb.thn), bulan: kodeBulan });
+      toast.sukses('Berhasil diunduh', `Rekap bulanan ${labelBulan(fb.bln, fb.thn)} diunduh sebagai Excel.`);
+      return;
+    }
     const wb = XLSX.utils.book_new();
 
     const a = susunRingkasan(ringkas, meta);
@@ -80,7 +110,9 @@ export default function RekapMapel() {
   };
 
   const cetak = () => window.print();
-  const adaData = ringkas.length > 0 || sesi.length > 0;
+  const adaData = tab === 'bulanan' ? (bulanan?.siswa.length > 0 && bulanan?.hari.length > 0) : (ringkas.length > 0 || sesi.length > 0);
+  const sedangMemuat = tab === 'bulanan' ? loadingBulanan : loading;
+  const kelasBulanan = isAdmin ? (fb.kelas === 'Semua' ? 'Semua kelas' : fb.kelas) : (user?.kelas || '-');
 
   const ubah = (e) => setFilter((f) => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -96,24 +128,57 @@ export default function RekapMapel() {
   };
 
   return (
-    <div className="page">
+    <div className={`page ${tab === 'bulanan' ? 'rekap-bulanan-print' : ''}`}>
       {/* Kop khusus cetak (tidak tampil di layar) */}
-      <div className="print-only">
-        <h2>REKAP PRESENSI MATA PELAJARAN</h2>
-        <div>{NAMA_SEKOLAH}</div>
-        <div>Periode: {tglID(meta.mulai)} s.d. {tglID(meta.akhir)} | Kelas: {meta.kelas} | Mata pelajaran: {meta.mapel}</div>
-        <div>{tab === 'siswa' ? 'Ringkasan per Siswa' : 'Rincian per Pertemuan'} - dicetak {new Date().toLocaleString('id-ID')}</div>
-      </div>
+      {tab === 'bulanan' && (
+        <div className="print-only">
+          <h2>REKAP PRESENSI BULANAN</h2>
+          <div>{NAMA_SEKOLAH}</div>
+          <div>Bulan: {labelBulan(fb.bln, fb.thn)} | Kelas: {kelasBulanan}</div>
+          <div>Hari efektif: {bulanan?.hari.length ?? 0} hari - dicetak {new Date().toLocaleString('id-ID')}</div>
+        </div>
+      )}
+      {tab !== 'bulanan' && (
+        <div className="print-only">
+          <h2>REKAP PRESENSI MATA PELAJARAN</h2>
+          <div>{NAMA_SEKOLAH}</div>
+          <div>Periode: {tglID(meta.mulai)} s.d. {tglID(meta.akhir)} | Kelas: {meta.kelas} | Mata pelajaran: {meta.mapel}</div>
+          <div>{tab === 'siswa' ? 'Ringkasan per Siswa' : 'Rincian per Pertemuan'} - dicetak {new Date().toLocaleString('id-ID')}</div>
+        </div>
+      )}
 
       <div className="toolbar no-print">
         <h2 className="toolbar__title">Rekap Presensi Mata Pelajaran{!isAdmin && user?.kelas ? ` - Kelas ${user.kelas}` : ''}</h2>
         <div className="toolbar__right">
-          <button type="button" className="btn btn--primary" onClick={unduhExcel} disabled={!adaData || loading}>Unduh Excel</button>{' '}
-          <button type="button" className="btn btn--ghost" onClick={cetak} disabled={!adaData || loading}>Cetak</button>
+          <button type="button" className="btn btn--primary" onClick={unduhExcel} disabled={!adaData || sedangMemuat}>Unduh Excel</button>{' '}
+          <button type="button" className="btn btn--ghost" onClick={cetak} disabled={!adaData || sedangMemuat}>Cetak</button>
         </div>
       </div>
 
-      <div className="sesi-filter no-print">
+      {tab === 'bulanan' && (
+        <div className="sesi-filter no-print">
+          <label className="form__label">Bulan
+            <select className="form__input" value={fb.bln} onChange={(e) => setFb((f) => ({ ...f, bln: Number(e.target.value) }))}>
+              {NAMA_BULAN.map((n, i) => <option key={n} value={i + 1}>{n}</option>)}
+            </select>
+          </label>
+          <label className="form__label">Tahun
+            <select className="form__input" value={fb.thn} onChange={(e) => setFb((f) => ({ ...f, thn: Number(e.target.value) }))}>
+              {daftarTahun.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </label>
+          {isAdmin && (
+            <label className="form__label">Kelas
+              <select className="form__input" value={fb.kelas} onChange={(e) => setFb((f) => ({ ...f, kelas: e.target.value }))}>
+                <option value="Semua">Semua</option>
+                {kelasList.map((k) => <option key={k} value={k}>{k}</option>)}
+              </select>
+            </label>
+          )}
+        </div>
+      )}
+
+      {tab !== 'bulanan' && <div className="sesi-filter no-print">
         <label className="form__label">Dari<input type="date" className="form__input" name="mulai" value={filter.mulai} max={filter.akhir} onChange={ubah} /></label>
         <label className="form__label">Sampai<input type="date" className="form__input" name="akhir" value={filter.akhir} min={filter.mulai} onChange={ubah} /></label>
         {isAdmin && (
@@ -130,26 +195,29 @@ export default function RekapMapel() {
             {mapelList.map((m) => <option key={m.id} value={m.id}>{m.nama}</option>)}
           </select>
         </label>
-      </div>
+      </div>}
 
       {error && <div className="form__error no-print" role="alert">{error}</div>}
-      {loading && <p className="no-print">Memuat...</p>}
-      {sesi.length >= BATAS_SESI && (
+      {loading && tab !== 'bulanan' && <p className="no-print">Memuat...</p>}
+      {tab !== 'bulanan' && sesi.length >= BATAS_SESI && (
         <div className="form__warn no-print">Hanya {BATAS_SESI} pertemuan terbaru yang ditampilkan dan diekspor. Persempit rentang tanggal atau pilih kelas/mapel tertentu.</div>
       )}
 
       <div className="tab-bar no-print">
         <button type="button" className={tab === 'siswa' ? 'is-aktif' : ''} onClick={() => setTab('siswa')}>Ringkasan per Siswa</button>
         <button type="button" className={tab === 'sesi' ? 'is-aktif' : ''} onClick={() => setTab('sesi')}>Rincian per Pertemuan</button>
+        <button type="button" className={tab === 'bulanan' ? 'is-aktif' : ''} onClick={() => setTab('bulanan')}>Rekap Bulanan</button>
       </div>
+
+      {tab === 'bulanan' && <RekapBulanan data={bulanan} loading={loadingBulanan} />}
 
       {tab === 'siswa' && (
         <div className="table-wrap"><table className="table">
-          <thead><tr><th>No</th><th>NISN</th><th>Nama</th><th>Kelas</th><th>H</th><th>I</th><th>S</th><th>A</th><th>Total Jam</th><th>% Hadir</th></tr></thead>
+          <thead><tr><th>No</th><th className="col-kiri">NISN</th><th className="col-kiri">Nama</th><th>Kelas</th><th>H</th><th>I</th><th>S</th><th>A</th><th>Total Jam</th><th>% Hadir</th></tr></thead>
           <tbody>
             {ringkas.map((r, i) => (
               <tr key={r.nis}>
-                <td className="text-center">{i + 1}</td><td>{r.nis}</td><td>{r.nama}</td><td className="text-center">{r.kelas}</td>
+                <td className="text-center">{i + 1}</td><td className="col-kiri">{r.nis}</td><td className="col-kiri">{r.nama}</td><td className="text-center">{r.kelas}</td>
                 <td className="text-center">{r.h}</td><td className="text-center">{r.i}</td><td className="text-center">{r.s}</td><td className="text-center">{r.a}</td>
                 <td className="text-center">{r.total}</td><td className="text-center">{persen(r.h, r.total)}</td>
               </tr>

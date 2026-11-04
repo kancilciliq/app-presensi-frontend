@@ -233,8 +233,8 @@ const DataSiswa = () => {
         <thead>
           <tr>
             <th>No</th>
-            <th>NISN</th>
-            <th>Nama Lengkap</th>
+            <th className="col-kiri">NISN</th>
+            <th className="col-kiri">Nama Lengkap</th>
             <th>Kelas</th>
             <th>No WA Ortu</th>
             {tampilQR && <th>QR Code (NIS)</th>}
@@ -245,8 +245,8 @@ const DataSiswa = () => {
           {pagination.visibleItems.map((item, index) => (
             <tr key={item.nis}>
               <td className="text-center">{pagination.startIndex + index + 1}</td>
-              <td className="text-center">{item.nis}</td>
-              <td>{item.nama}</td>
+              <td className="col-kiri">{item.nis}</td>
+              <td className="col-kiri">{item.nama}</td>
               <td className="text-center">{item.kelas}</td>
               <td>{item.no_wa_ortu}</td>
               {tampilQR && (

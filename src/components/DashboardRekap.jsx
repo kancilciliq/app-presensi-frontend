@@ -147,8 +147,8 @@ const DashboardRekap = () => {
             <th>Waktu Masuk</th>
             {/* [BARU] kolom Waktu Pulang */}
             <th>Waktu Pulang</th>
-            <th>NISN</th>
-            <th>Nama Siswa</th>
+            <th className="col-kiri">NISN</th>
+            <th className="col-kiri">Nama Siswa</th>
             <th>Kelas</th>
             <th>Status</th>
           </tr>
@@ -165,8 +165,8 @@ const DashboardRekap = () => {
                 <td className="text-center">{new Date(item.waktu_masuk).toLocaleString('id-ID')}</td>
                 {/* [BARU] */}
                 <td className="text-center">{item.waktu_pulang ? new Date(item.waktu_pulang).toLocaleString('id-ID') : '-'}</td>
-                <td className="text-center">{item.nis}</td>
-                <td>{item.nama}</td>
+                <td className="col-kiri">{item.nis}</td>
+                <td className="col-kiri">{item.nama}</td>
                 <td className="text-center">{item.kelas}</td>
                 <td className={`text-center status ${item.status === 'Terlambat' ? 'status--terlambat' : 'status--tepat'}`}>
                   {item.status}

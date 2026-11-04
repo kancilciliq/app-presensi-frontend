@@ -123,13 +123,13 @@ export default function PresensiMapel() {
           </div>
 
           <div className="table-wrap"><table className="table">
-            <thead><tr><th>No</th><th>NISN</th><th>Nama</th><th>Scan Pagi</th><th>Status</th></tr></thead>
+            <thead><tr><th>No</th><th className="col-kiri">NISN</th><th className="col-kiri">Nama</th><th>Scan Pagi</th><th>Status</th></tr></thead>
             <tbody>
               {info.siswa.map((s, i) => (
                 <tr key={s.nis} className={status[s.nis] ? '' : 'baris-kosong'}>
                   <td className="text-center">{i + 1}</td>
-                  <td>{s.nis}</td>
-                  <td>{s.nama}</td>
+                  <td className="col-kiri">{s.nis}</td>
+                  <td className="col-kiri">{s.nama}</td>
                   <td className="text-center">
                     <span className={`tag-pagi ${s.hadir_pagi ? 'tag-pagi--ya' : 'tag-pagi--tidak'}`}>{s.hadir_pagi ? 'Sudah' : 'Belum'}</span>
                   </td>

@@ -1,0 +1,64 @@
+/* =====================================================================
+   rekap-bulanan.css - tab "Rekap Bulanan" di halaman Rekap Mapel
+   ===================================================================== */
+.bulanan-info { margin-bottom: 12px; }
+.bulanan-legenda { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.9rem; }
+.bulanan-hari { margin-left: auto; }
+.bulanan-aturan { margin-top: 8px; font-size: 0.88rem; color: var(--color-text-soft); }
+.bulanan-aturan summary { cursor: pointer; color: var(--color-primary); font-weight: 500; }
+.bulanan-aturan ul { margin: 6px 0 0; padding-left: 20px; }
+.bulanan-aturan li { margin-bottom: 4px; }
+
+/* Kotak status H / I / S / A */
+.sel { font-weight: 700; }
+.bulanan-legenda .sel { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; }
+.sel--H { color: #15803d; background: #f0fdf4; }
+.sel--I { color: #2563eb; background: #eff6ff; }
+.sel--S { color: #b45309; background: #fffbeb; }
+.sel--A { color: #dc2626; background: #fdecee; }
+
+/* Tabel kotak-kotak: kolom tanggal sempit */
+.table--grid { min-width: 0; width: max-content; }
+.table--grid th, .table--grid td { padding: 7px 6px; }
+.table--grid th.col-tgl, .table--grid td.sel { min-width: 30px; padding-left: 2px; padding-right: 2px; }
+.table--grid .col-kiri { padding-left: 10px; padding-right: 10px; }
+
+/* ---------- FREEZE: kolom No, NISN, Nama, Kelas + baris judul tetap terlihat ---------- */
+/* Area tabel bisa digeser ke samping DAN ke bawah (judul tanggal ikut tertahan) */
+.bulanan-wrap { max-height: 72vh; overflow: auto; }
+
+.table--grid { table-layout: auto; }
+.table--grid thead th { position: sticky; top: 0; z-index: 3; }
+
+/* Lebar & posisi kolom beku. left = jumlah lebar kolom beku di sebelah kirinya */
+.table--grid .frz { position: sticky; background: #fff; z-index: 2; box-sizing: border-box; }
+.table--grid thead .frz { background: var(--color-muted); z-index: 5; }
+.table--grid .frz-1 { left: 0;     width: 44px;  min-width: 44px;  max-width: 44px; }
+.table--grid .frz-2 { left: 44px;  width: 112px; min-width: 112px; max-width: 112px; }
+.table--grid .frz-3 { left: 156px; width: 180px; min-width: 180px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.table--grid .frz-4 { left: 336px; width: 64px;  min-width: 64px;  max-width: 64px; box-shadow: 2px 0 0 var(--color-border); }
+
+/* HP: empat kolom beku terlalu lebar, jadi hanya Nama yang dibekukan */
+@media (max-width: 700px) {
+  .bulanan-wrap { max-height: 70vh; }
+  .table--grid .frz-1, .table--grid .frz-2, .table--grid .frz-4 { position: static; box-shadow: none; }
+  .table--grid thead .frz-1, .table--grid thead .frz-2, .table--grid thead .frz-4 { position: sticky; }
+  .table--grid .frz-3 { left: 0; width: 130px; min-width: 130px; max-width: 130px; box-shadow: 2px 0 0 var(--color-border); }
+}
+
+/* Cetak: tabel bulanan di kertas A4 mendatar */
+@page bulanan { size: A4 landscape; margin: 10mm; }
+.rekap-bulanan-print { page: bulanan; }
+
+@media (max-width: 600px) {
+  .bulanan-hari { margin-left: 0; width: 100%; }
+}
+
+@media print {
+  .table--grid { font-size: 8.5px; width: 100%; }
+  .table--grid th, .table--grid td { padding: 3px 2px; }
+  .table--grid th.col-tgl, .table--grid td.sel { min-width: 0; }
+  .table--grid .frz, .table--grid thead th { position: static !important; box-shadow: none !important; width: auto !important; min-width: 0 !important; max-width: none !important; white-space: normal; }
+  .table-wrap, .bulanan-wrap { overflow: visible; max-height: none; }
+  .sel--A, .sel--I, .sel--S, .sel--H { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

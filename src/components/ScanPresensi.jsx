@@ -246,8 +246,8 @@ const ScanPresensi = () => {
             <th>Waktu Masuk</th>
             {/* [BARU] kolom Waktu Pulang */}
             <th>Waktu Pulang</th>
-            <th>NISN</th>
-            <th>Nama</th>
+            <th className="col-kiri">NISN</th>
+            <th className="col-kiri">Nama</th>
             <th>Kelas</th>
             <th>Status</th>
           </tr>
@@ -259,8 +259,8 @@ const ScanPresensi = () => {
               <td>{new Date(item.waktu_masuk).toLocaleTimeString('id-ID')} WIB</td>
               {/* [BARU] tanda minus bila belum scan pulang */}
               <td>{item.waktu_pulang ? `${new Date(item.waktu_pulang).toLocaleTimeString('id-ID')} WIB` : '-'}</td>
-              <td>{item.nis}</td>
-              <td>{item.nama}</td>
+              <td className="col-kiri">{item.nis}</td>
+              <td className="col-kiri">{item.nama}</td>
               <td>{item.kelas}</td>
               <td className={`status ${item.status === 'Terlambat' ? 'status--terlambat' : 'status--tepat'}`}>
                 {item.status}
